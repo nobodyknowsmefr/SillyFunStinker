@@ -132,9 +132,10 @@ export default function App() {
       {/* Floating UI Overlay */}
       <div className="overlay">
 
-        {/* Logo — top center */}
-        <div className="header-logo">
+        {/* Logo — top center, fades out when fortune is revealed */}
+        <div className={`header-logo ${phase !== 'shower' ? 'header-logo--hidden' : ''}`}>
           <img src="/thelogo.png" alt="The Shape Store" className="header-logo__img" />
+          <img src="/ykarelogo.png" alt="YKARE" className="header-logo__sub" />
         </div>
 
 
