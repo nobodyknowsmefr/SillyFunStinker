@@ -1,4 +1,3 @@
 {
-  "framework": "vite",
-  "toolbar": false
+  "framework": "vite"
 }
