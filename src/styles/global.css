@@ -95,7 +95,7 @@ body {
 
 .header-logo {
   position: absolute;
-  top: 24px;
+  top: 74px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -121,10 +121,11 @@ body {
 }
 
 .header-logo__sub {
-  height: 28px;
+  height: 250px;
   width: auto;
   object-fit: contain;
-  opacity: 0.5;
+  opacity: 1;
+  margin-top: -300px;
 }
 
 /* ========== CAUSE BADGE — top right ========== */
@@ -659,7 +660,7 @@ body {
   .action-btn { font-size: 1.15rem; padding: 14px 36px; letter-spacing: 2.5px; }
 
   /* Fortune flow — lower on mobile, below back button */
-  .fortune-flow { padding: 14vh 4vw 0; }
+  .fortune-flow { padding: calc(14vh + 35px) 4vw 0; }
   .fortune-flow__words {
     max-width: 92vw;
     gap: 4px 6px;

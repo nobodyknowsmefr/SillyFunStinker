@@ -736,7 +736,7 @@ function SceneContent({ sequence, phase, fillLevel, beadScreenPositionsRef }) {
       {!isMobile && <LightBeam phase={phase} />}
 
       {/* Water tube — purchase progress gauge */}
-      <WaterTube fillLevel={fillLevel} position={isMobile ? [-1.0, -0.3, 1.5] : [-2.2, 0.2, 1.0]} mobileScale={isMobile ? 0.5 : 0.8} />
+      <WaterTube fillLevel={fillLevel} position={isMobile ? [0, 0.2, 1.5] : [-2.2, 0.2, 1.0]} mobileScale={isMobile ? 0.5 : 0.8} visible={phase === 'shower'} />
 
       {/* Shower head */}
       {phase !== 'formed' && <ShowerHead opacity={showerOpacity} />}

@@ -25,6 +25,7 @@ const fragmentShader = /* glsl */ `
   uniform vec3  uOutline;
   uniform vec2  uMouse;
   uniform float uMouseActive;
+  uniform float uOpacity;
 
   varying vec2 vUv;
 
@@ -246,18 +247,22 @@ const fragmentShader = /* glsl */ `
     // Discard fully transparent pixels
     if (finalAlpha < 0.01) discard;
 
-    gl_FragColor = vec4(finalColor, finalAlpha);
+    gl_FragColor = vec4(finalColor, finalAlpha * uOpacity);
   }
 `;
 
 /* ---- Component ---- */
 
-export default function WaterTube({ fillLevel = 0.35, position = [-2.5, 0.5, 0.5], mobileScale = 1 }) {
+export default function WaterTube({ fillLevel = 0.35, position = [-2.5, 0.5, 0.5], mobileScale = 1, visible = true }) {
   const matRef = useRef();
   const fillSmooth = useRef(fillLevel);
   const mouseUV = useRef(new THREE.Vector2(0.5, 0.5));
   const mouseActive = useRef(0);
   const mouseOver = useRef(false);
+  const groupRef = useRef();
+  const opacityRef = useRef(visible ? 1 : 0);
+  const visibleRef = useRef(visible);
+  visibleRef.current = visible;
   const lilwaterTex = useTexture('/lilwater.png');
   const lilbillTex = useTexture('/lilbill.png');
 
@@ -269,6 +274,7 @@ export default function WaterTube({ fillLevel = 0.35, position = [-2.5, 0.5, 0.5
     uOutline:     { value: new THREE.Color('#1A1918') },
     uMouse:       { value: new THREE.Vector2(0.5, 0.5) },
     uMouseActive: { value: 0 },
+    uOpacity:     { value: 1 },
   }), []);
 
   const onPointerMove = useCallback((e) => {
@@ -292,11 +298,22 @@ export default function WaterTube({ fillLevel = 0.35, position = [-2.5, 0.5, 0.5
     mouseActive.current += (target - mouseActive.current) * 0.08;
     matRef.current.uniforms.uMouse.value.copy(mouseUV.current);
     matRef.current.uniforms.uMouseActive.value = mouseActive.current;
+
+    // Smooth fade in/out
+    const targetOpacity = visibleRef.current ? 1 : 0;
+    opacityRef.current += (targetOpacity - opacityRef.current) * 0.06;
+    matRef.current.uniforms.uOpacity.value = opacityRef.current;
+    if (groupRef.current) {
+      groupRef.current.visible = opacityRef.current > 0.01;
+      groupRef.current.traverse((child) => {
+        if (child.material && child.material !== matRef.current) child.material.opacity = opacityRef.current;
+      });
+    }
   });
 
   return (
     <Billboard position={position} follow lockX={false} lockY={false} lockZ={false}>
-      <group scale={[mobileScale, mobileScale, mobileScale]}>
+      <group ref={groupRef} scale={[mobileScale, mobileScale, mobileScale]}>
         <mesh onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
           <planeGeometry args={[1.2, 3.0]} />
           <shaderMaterial
