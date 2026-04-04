@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
 import FortuneTextFlow from './components/FortuneTextFlow';
 import ErrorBoundary from './components/ErrorBoundary';
+import ShopPage from './components/ShopPage';
 import { generateValidSequence } from './logic/sequenceGenerator';
 import { generateProphecy } from './logic/prophecyGenerator';
 import { useShopifyFill } from './hooks/useShopifyFill';
@@ -9,6 +10,49 @@ import html2canvas from 'html2canvas';
 const ShapeTreeScene = lazy(() => import('./components/ShapeTreeScene'));
 
 const WACKY_COLORS = ['#D63230', '#F5B700', '#1B4DE4', '#2D936C'];
+
+const TRAIL_SHAPES = [
+  (c) => `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><rect width="12" height="12" rx="1" fill="${c}"/></svg>`,
+  (c) => `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="6" fill="${c}"/></svg>`,
+  (c) => `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="13"><polygon points="7,0 14,13 0,13" fill="${c}"/></svg>`,
+  (c) => `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"><polygon points="7,0 9,5 14,5 10,8.5 11.5,14 7,10.5 2.5,14 4,8.5 0,5 5,5" fill="${c}"/></svg>`,
+];
+
+function CursorTrail() {
+  const lastPos = useRef({ x: 0, y: 0 });
+  const counter = useRef(0);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      const dx = e.clientX - lastPos.current.x;
+      const dy = e.clientY - lastPos.current.y;
+      if (Math.abs(dx) + Math.abs(dy) < 14) return;
+      lastPos.current = { x: e.clientX, y: e.clientY };
+
+      const color = WACKY_COLORS[counter.current % 4];
+      const shapeFn = TRAIL_SHAPES[counter.current % TRAIL_SHAPES.length];
+      counter.current++;
+
+      const el = document.createElement('div');
+      el.className = 'cursor-trail-particle';
+      const size = 8 + Math.random() * 8;
+      el.style.left = `${e.clientX - size / 2}px`;
+      el.style.top = `${e.clientY - size / 2}px`;
+      el.style.width = `${size}px`;
+      el.style.height = `${size}px`;
+      el.innerHTML = shapeFn(color);
+      el.firstChild.style.width = '100%';
+      el.firstChild.style.height = '100%';
+      document.body.appendChild(el);
+
+      setTimeout(() => el.remove(), 800);
+    };
+    window.addEventListener('pointermove', onMove);
+    return () => window.removeEventListener('pointermove', onMove);
+  }, []);
+
+  return null;
+}
 
 function WackyText({ text }) {
   let letterIdx = 0;
@@ -38,6 +82,9 @@ export default function App() {
   const [seed, setSeed] = useState('');
   const [phase, setPhase] = useState('shower'); // 'shower' | 'forming' | 'formed'
   const [busy, setBusy] = useState(false);
+  const [page, setPage] = useState('fortune'); // 'fortune' | 'flipping' | 'shop'
+  const [flipped, setFlipped] = useState(false);
+  const [fortuneImage, setFortuneImage] = useState(null);
   const exportRef = useRef(null);
   const beadScreenPositionsRef = useRef([]);
 
@@ -91,6 +138,36 @@ export default function App() {
     setProphecy(null);
   }, []);
 
+  const handleObtain = useCallback(async () => {
+    // Capture the fortune card image before flipping
+    if (exportRef.current) {
+      try {
+        const canvas = await html2canvas(exportRef.current, {
+          backgroundColor: '#FAF8F5',
+          scale: 2,
+        });
+        setFortuneImage(canvas.toDataURL('image/png'));
+      } catch (e) {
+        console.error('Fortune capture failed:', e);
+      }
+    }
+    setPage('flipping');
+    requestAnimationFrame(() => {
+      setFlipped(true);
+    });
+    setTimeout(() => {
+      setPage('shop');
+    }, 1100);
+  }, []);
+
+  const handleShopBack = useCallback(() => {
+    setPage('flipping');
+    setFlipped(false);
+    setTimeout(() => {
+      setPage('fortune');
+    }, 1100);
+  }, []);
+
   const handleSaveImage = useCallback(async () => {
     if (!exportRef.current) return;
     try {
@@ -110,8 +187,24 @@ export default function App() {
 
   const showResults = phase === 'formed' && prophecy;
 
+  const showShopFlip = page === 'flipping' || page === 'shop';
+
   return (
     <div className="app">
+      <CursorTrail />
+
+      {/* 3D Page Flip Overlay */}
+      {showShopFlip && (
+        <div className={`page-flip-wrapper ${flipped ? 'flipped' : ''}`}>
+          <div className="page-flip-front">
+            {/* Empty — the main app is visible behind */}
+          </div>
+          <div className="page-flip-back">
+            <ShopPage onBack={handleShopBack} fortuneImage={fortuneImage} />
+          </div>
+        </div>
+      )}
+
       {/* Fullscreen 3D Scene */}
       <div className="scene-fullscreen">
         <Suspense fallback={
@@ -217,6 +310,15 @@ export default function App() {
                 <WackyText text="NEW FORTUNE" />
               </button>
             </div>
+          </div>
+        )}
+
+        {/* OBTAIN button — below necklace after fortune revealed */}
+        {showResults && page === 'fortune' && (
+          <div className="obtain-action">
+            <button className="obtain-btn" onClick={handleObtain}>
+              <WackyText text="OBTAIN" />
+            </button>
           </div>
         )}
       </div>

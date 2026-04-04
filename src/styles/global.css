@@ -32,6 +32,7 @@ html, body, #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32' viewBox='0 0 28 32'%3E%3Crect x='4' y='0' width='4' height='4' fill='%231A1918'/%3E%3Crect x='4' y='4' width='4' height='4' fill='%231A1918'/%3E%3Crect x='4' y='8' width='4' height='4' fill='%23D63230'/%3E%3Crect x='4' y='12' width='4' height='4' fill='%23D63230'/%3E%3Crect x='4' y='16' width='4' height='4' fill='%23F5B700'/%3E%3Crect x='4' y='20' width='4' height='4' fill='%23F5B700'/%3E%3Crect x='8' y='4' width='4' height='4' fill='%231A1918'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%23D63230'/%3E%3Crect x='8' y='12' width='4' height='4' fill='%231B4DE4'/%3E%3Crect x='8' y='16' width='4' height='4' fill='%231B4DE4'/%3E%3Crect x='8' y='20' width='4' height='4' fill='%232D936C'/%3E%3Crect x='8' y='24' width='4' height='4' fill='%232D936C'/%3E%3Crect x='12' y='8' width='4' height='4' fill='%231A1918'/%3E%3Crect x='12' y='12' width='4' height='4' fill='%23F5B700'/%3E%3Crect x='12' y='16' width='4' height='4' fill='%23D63230'/%3E%3Crect x='12' y='20' width='4' height='4' fill='%231B4DE4'/%3E%3Crect x='12' y='24' width='4' height='4' fill='%232D936C'/%3E%3Crect x='12' y='28' width='4' height='4' fill='%231A1918'/%3E%3Crect x='16' y='12' width='4' height='4' fill='%231A1918'/%3E%3Crect x='16' y='16' width='4' height='4' fill='%232D936C'/%3E%3Crect x='16' y='20' width='4' height='4' fill='%231A1918'/%3E%3Crect x='0' y='0' width='4' height='4' fill='%231A1918'/%3E%3Crect x='0' y='4' width='4' height='4' fill='%231A1918'/%3E%3C/svg%3E") 2 0, auto;
 }
 
 body {
@@ -40,6 +41,22 @@ body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== CURSOR SHAPE TRAIL ========== */
+
+.cursor-trail-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, opacity;
+  animation: trailFade 0.8s ease-out forwards;
+}
+
+@keyframes trailFade {
+  0%   { opacity: 1; transform: scale(1) rotate(0deg); }
+  50%  { opacity: 0.6; transform: scale(0.7) rotate(90deg); }
+  100% { opacity: 0; transform: scale(0) rotate(180deg); }
 }
 
 /* ========== FULLSCREEN LAYOUT ========== */
@@ -633,6 +650,469 @@ body {
   white-space: nowrap;
 }
 
+/* ========== OBTAIN BUTTON — below necklace after fortune ========== */
+
+.obtain-action {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  text-align: center;
+  animation: obtainFadeIn 0.6s ease both;
+}
+
+.obtain-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 5px;
+  background: transparent;
+  border: none;
+  padding: 18px 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  transition: transform 0.2s ease;
+}
+
+.obtain-btn:hover {
+  transform: scale(1.06);
+}
+
+.obtain-btn:active {
+  transform: scale(0.97);
+}
+
+@keyframes obtainFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ========== 3D PAGE FLIP — fortune → shop ========== */
+
+.page-flip-wrapper {
+  position: fixed;
+  inset: 0;
+  perspective: 1200px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.page-flip-front,
+.page-flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.page-flip-front {
+  transform: rotateY(0deg);
+}
+
+.page-flip-back {
+  transform: rotateY(180deg);
+}
+
+.page-flip-wrapper.flipped .page-flip-front {
+  transform: rotateY(-180deg);
+}
+
+.page-flip-wrapper.flipped .page-flip-back {
+  transform: rotateY(0deg);
+}
+
+/* ========== SHOP PAGE — Vista desktop ========== */
+
+.shop-page {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 35%, #FEFCF9 0%, var(--cream) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Floating background shapes ---- */
+
+.vista-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.vista-shape {
+  position: absolute;
+  animation: vistaFloat linear infinite;
+  pointer-events: none;
+}
+
+.vista-shape--circle { border-radius: 50%; }
+.vista-shape--square { border-radius: 2px; }
+.vista-shape--triangle {
+  background: transparent !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 24px solid currentColor;
+}
+.vista-shape--star {
+  font-size: 28px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes vistaFloat {
+  0%   { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-18px) rotate(8deg); }
+  50%  { transform: translateY(0) rotate(-5deg); }
+  75%  { transform: translateY(14px) rotate(6deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* ---- Vista-style floating popup windows ---- */
+
+.vista-popup {
+  position: absolute;
+  z-index: 5;
+  width: 380px;
+  border-radius: 8px 8px 4px 4px;
+  overflow: hidden;
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: box-shadow 0.2s ease;
+}
+
+.vista-popup--necklace {
+  animation-delay: 0s;
+}
+
+.vista-popup--fortune {
+  width: 340px;
+}
+
+.vista-popup--notepad {
+  width: 400px;
+}
+
+@keyframes popupBob {
+  0%   { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-10px) rotate(1.5deg); }
+  50%  { transform: translateY(0) rotate(0deg); }
+  75%  { transform: translateY(8px) rotate(-1deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+.vista-popup__titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 4px 8px;
+  background: linear-gradient(180deg, #3a7bd5 0%, #1e5bb8 50%, #1a4fa0 100%);
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  min-height: 22px;
+}
+
+.vista-popup__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.vista-popup__controls {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.vista-popup__ctrl {
+  width: 18px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.vista-popup__ctrl--close {
+  background: linear-gradient(180deg, #e04343, #c03030);
+  border-color: #a02020;
+}
+
+.vista-popup__body {
+  background: #fff;
+  padding: 6px;
+}
+
+.vista-popup--minimized {
+  width: auto !important;
+}
+
+.vista-popup--minimized .vista-popup__titlebar {
+  border-radius: 4px;
+}
+
+/* Notepad-style popup */
+.vista-popup--notepad .vista-popup__titlebar {
+  background: linear-gradient(180deg, #6b8fc7 0%, #4a6ea0 50%, #3d5f8a 100%);
+}
+
+.vista-popup--notepad .vista-popup__body {
+  padding: 0;
+}
+
+.notepad-menubar {
+  display: flex;
+  gap: 0;
+  padding: 1px 4px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #c0c0c0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.6rem;
+  color: #333;
+}
+
+.notepad-menubar span {
+  padding: 2px 8px;
+  cursor: default;
+}
+
+.notepad-content {
+  padding: 8px 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: #000;
+  background: #fff;
+  min-height: 100px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.vista-popup__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+}
+
+/* ---- Vista browser window ---- */
+
+.vista-browser {
+  position: relative;
+  z-index: 2;
+  width: 72%;
+  max-width: 800px;
+  height: auto;
+  max-height: 78vh;
+  border-radius: 8px 8px 4px 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.22),
+    0 4px 14px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: #f0f0f0;
+}
+
+.vista-browser__titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  background: linear-gradient(180deg, #4a9aea 0%, #3a7bd5 30%, #2968b8 60%, #1e5bb8 100%);
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.75rem;
+  min-height: 28px;
+  flex-shrink: 0;
+}
+
+.vista-browser__favicon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.vista-browser__title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.vista-browser__controls {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.vista-browser__ctrl {
+  width: 24px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.2);
+  cursor: default;
+}
+
+.vista-browser__ctrl--close {
+  background: linear-gradient(180deg, #e86b6b, #c03030);
+  border-color: #a02020;
+}
+
+.vista-browser__menubar {
+  display: flex;
+  gap: 0;
+  padding: 1px 8px;
+  background: linear-gradient(180deg, #f8f8f8, #e8e8e8);
+  border-bottom: 1px solid #c0c0c0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.7rem;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.vista-browser__menubar span {
+  padding: 3px 10px;
+  cursor: default;
+}
+
+.vista-browser__menubar span:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.vista-browser__addressbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: linear-gradient(180deg, #f2f2f2, #e4e4e4);
+  border-bottom: 1px solid #b8b8b8;
+  flex-shrink: 0;
+}
+
+.vista-browser__address-label {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.65rem;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.vista-browser__address-input {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #7f9db9;
+  border-radius: 2px;
+  padding: 3px 8px;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.7rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vista-browser__lock {
+  font-size: 0.6rem;
+}
+
+.vista-browser__go {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.65rem;
+  padding: 3px 12px;
+  background: linear-gradient(180deg, #f8f8f8, #e0e0e0);
+  border: 1px solid #a0a0a0;
+  border-radius: 2px;
+  cursor: default;
+  color: #333;
+}
+
+.vista-browser__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.vista-browser__bg {
+  min-height: 100%;
+  background: radial-gradient(ellipse at 50% 35%, #FEFCF9 0%, var(--cream) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  gap: 32px;
+}
+
+.vista-browser__statusbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 10px;
+  background: linear-gradient(180deg, #f0f0f0, #e0e0e0);
+  border-top: 1px solid #c0c0c0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 0.6rem;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.shop-header__logo {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+}
+
+.shop-product {
+  width: 100%;
+  max-width: 400px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-back-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  color: var(--ink-50);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px 20px;
+  transition: color 0.2s ease;
+}
+
+.shop-back-btn:hover {
+  color: var(--ink);
+}
+
 /* ========== RESPONSIVE ========== */
 
 @media (max-width: 768px) {
@@ -669,4 +1149,81 @@ body {
 
   /* Hide shape GIF on mobile */
   .shape-gif { display: none !important; }
+
+  /* Obtain button */
+  .obtain-btn { font-size: 1.4rem; padding: 14px 36px; letter-spacing: 3px; }
+
+  /* Vista shop page — browser fits without scrolling */
+  .vista-browser { width: 96%; height: auto; max-height: 58vh; margin-top: auto; }
+  .vista-browser__menubar { display: none; }
+  .vista-browser__bg { padding: 16px 12px; gap: 16px; }
+  .vista-browser__content { overflow-y: auto; }
+  .shop-header__logo { height: 50px; }
+  .shop-product { min-height: 120px; }
+  .shop-back-btn { padding: 6px 16px; font-size: 0.75rem; }
+
+  /* Popups: horizontal strip at top on mobile, draggable */
+  .shop-page {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 6px;
+    gap: 6px;
+  }
+  .vista-popup-row {
+    position: relative;
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    padding: 0 6px;
+    z-index: 10;
+    flex-shrink: 0;
+    overflow: visible;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .vista-popup-row .vista-popup {
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto !important;
+    max-width: none !important;
+    transform-origin: top center;
+  }
+  .vista-popup-row .vista-popup--minimized {
+    flex: 0 0 auto;
+  }
+  .vista-popup-row .vista-popup__img {
+    max-height: 90px;
+    width: 100%;
+    object-fit: contain;
+  }
+  .vista-popup-row .notepad-content {
+    font-size: 0.55rem;
+    line-height: 1.35;
+    max-height: 72px;
+    overflow-y: auto;
+    padding: 5px 7px;
+    word-break: break-word;
+  }
+  .vista-popup-row .notepad-menubar {
+    font-size: 0.5rem;
+    padding: 1px 3px;
+  }
+  .vista-popup-row .notepad-menubar span {
+    padding: 1px 5px;
+  }
+  .vista-popup-row .vista-popup__titlebar {
+    padding: 4px 5px 4px 7px;
+    font-size: 0.6rem;
+    min-height: 20px;
+  }
+  .vista-popup-row .vista-popup__ctrl {
+    width: 16px;
+    height: 14px;
+    font-size: 0.55rem;
+  }
 }
