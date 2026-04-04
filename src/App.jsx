@@ -89,7 +89,7 @@ export default function App() {
   const beadScreenPositionsRef = useRef([]);
 
   // Shopify purchase progress — swap mode to 'live' + set apiUrl for production
-  const { fillLevel, total, goal } = useShopifyFill({ mode: 'demo', goal: 50000 });
+  const { fillLevel, total, goal } = useShopifyFill({ mode: 'live', goal: 100, apiUrl: '/api/fill-level', pollInterval: 10000 });
 
   const handleReveal = useCallback(() => {
     if (busy) return;
