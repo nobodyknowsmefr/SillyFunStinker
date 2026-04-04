@@ -654,7 +654,7 @@ body {
 
 .obtain-action {
   position: absolute;
-  bottom: 8%;
+  bottom: calc(8% + 10px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -922,7 +922,8 @@ body {
   width: 72%;
   max-width: 800px;
   height: auto;
-  max-height: 78vh;
+  max-height: 85vh;
+  margin-bottom: 4vh;
   border-radius: 8px 8px 4px 4px;
   overflow: hidden;
   display: flex;
@@ -1060,13 +1061,12 @@ body {
 }
 
 .vista-browser__bg {
-  min-height: 100%;
   background: radial-gradient(ellipse at 50% 35%, #FEFCF9 0%, var(--cream) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 24px;
-  gap: 32px;
+  padding: 24px 24px 16px;
+  gap: 16px;
 }
 
 .vista-browser__statusbar {
@@ -1082,7 +1082,7 @@ body {
 }
 
 .shop-header__logo {
-  height: 120px;
+  height: 80px;
   width: auto;
   object-fit: contain;
 }
@@ -1090,7 +1090,6 @@ body {
 .shop-product {
   width: 100%;
   max-width: 400px;
-  min-height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1151,10 +1150,11 @@ body {
   .shape-gif { display: none !important; }
 
   /* Obtain button */
+  .obtain-action { bottom: calc(8% + 95px); }
   .obtain-btn { font-size: 1.4rem; padding: 14px 36px; letter-spacing: 3px; }
 
   /* Vista shop page — browser fits without scrolling */
-  .vista-browser { width: 96%; height: auto; max-height: 58vh; margin-top: auto; }
+  .vista-browser { width: 96%; height: auto; max-height: 75vh; margin-top: auto; margin-bottom: 2vh; }
   .vista-browser__menubar { display: none; }
   .vista-browser__bg { padding: 16px 12px; gap: 16px; }
   .vista-browser__content { overflow-y: auto; }
@@ -1180,17 +1180,14 @@ body {
     overflow: visible;
     align-items: flex-start;
     justify-content: center;
+    touch-action: none;
   }
   .vista-popup-row .vista-popup {
     position: relative;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
     flex: 1 1 0;
     min-width: 0;
-    width: auto !important;
-    max-width: none !important;
+    width: auto;
+    max-width: none;
     transform-origin: top center;
   }
   .vista-popup-row .vista-popup--minimized {

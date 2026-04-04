@@ -344,7 +344,7 @@ function VistaPopup({ title, children, style, className = '', floatSeed = 0 }) {
   useEffect(() => {
     if (dragged.current) return;
     const isMobile = window.innerWidth <= 768;
-    if (isMobile) return; // no float animation on mobile
+    if (isMobile) return;
     const animate = () => {
       if (dragged.current || !popupRef.current) return;
       const t = (Date.now() - startTime.current) / 1000;
@@ -358,9 +358,9 @@ function VistaPopup({ title, children, style, className = '', floatSeed = 0 }) {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, [floatSeed]);
 
-  // Desktop pointer drag
+  // Desktop pointer drag (mouse only)
   const onPointerDown = useCallback((e) => {
-    if (e.pointerType === 'touch') return; // let touch handler deal with it
+    if (e.pointerType === 'touch') return;
     e.preventDefault();
     e.stopPropagation();
     dragged.current = true;
@@ -383,49 +383,61 @@ function VistaPopup({ title, children, style, className = '', floatSeed = 0 }) {
     document.addEventListener('pointerup', onUp);
   }, []);
 
-  // Mobile: direct touch events on the entire popup for drag + pinch
-  const onTouchStart = useCallback((e) => {
-    if (e.touches.length === 1) {
-      // Single finger — start drag
-      const touch = e.touches[0];
-      const rect = popupRef.current.getBoundingClientRect();
-      touchId.current = touch.identifier;
-      touchOffset.current = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-      dragged.current = true;
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-      popupRef.current.style.zIndex = '50';
-    } else if (e.touches.length === 2) {
-      // Two fingers — start pinch
-      touchId.current = null; // stop drag during pinch
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      pinchStartDist.current = Math.sqrt(dx * dx + dy * dy);
-      pinchStartScale.current = scaleRef.current;
-    }
-  }, []);
+  // Mobile: attach touch listeners imperatively with { passive: false } so preventDefault works
+  useEffect(() => {
+    const el = popupRef.current;
+    if (!el) return;
 
-  const onTouchMove = useCallback((e) => {
-    e.preventDefault();
-    if (e.touches.length === 2) {
-      // Pinch
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const s = Math.max(0.4, Math.min(2.5, pinchStartScale.current * (dist / pinchStartDist.current)));
-      scaleRef.current = s;
-      setScale(s);
-    } else if (e.touches.length === 1 && touchId.current !== null) {
-      // Drag
-      const touch = e.touches[0];
-      const p = { left: touch.clientX - touchOffset.current.x, top: touch.clientY - touchOffset.current.y };
-      posRef.current = p;
-      setPos(p);
-    }
-  }, []);
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const rect = el.getBoundingClientRect();
+        touchId.current = touch.identifier;
+        touchOffset.current = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+        dragged.current = true;
+        if (animRef.current) cancelAnimationFrame(animRef.current);
+        el.style.zIndex = '50';
+      } else if (e.touches.length === 2) {
+        e.preventDefault();
+        touchId.current = null;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDist.current = Math.sqrt(dx * dx + dy * dy);
+        pinchStartScale.current = scaleRef.current;
+      }
+    };
 
-  const onTouchEnd = useCallback(() => {
-    touchId.current = null;
-  }, []);
+    const handleTouchMove = (e) => {
+      e.preventDefault(); // THIS works because { passive: false }
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const s = Math.max(0.4, Math.min(2.5, pinchStartScale.current * (dist / pinchStartDist.current)));
+        scaleRef.current = s;
+        setScale(s);
+      } else if (e.touches.length === 1 && touchId.current !== null) {
+        const touch = e.touches[0];
+        const p = { left: touch.clientX - touchOffset.current.x, top: touch.clientY - touchOffset.current.y };
+        posRef.current = p;
+        setPos(p);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      touchId.current = null;
+    };
+
+    el.addEventListener('touchstart', handleTouchStart, { passive: false });
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    el.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      el.removeEventListener('touchstart', handleTouchStart);
+      el.removeEventListener('touchmove', handleTouchMove);
+      el.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [closed, minimized]);
 
   const handleMinimize = useCallback((e) => {
     e.stopPropagation();
@@ -450,16 +462,13 @@ function VistaPopup({ title, children, style, className = '', floatSeed = 0 }) {
     <div
       ref={popupRef}
       className={`vista-popup ${className} ${minimized ? 'vista-popup--minimized' : ''}`}
-      style={mergedStyle}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      style={{ ...mergedStyle, touchAction: 'none' }}
     >
-      <div className="vista-popup__titlebar" onPointerDown={onPointerDown} style={{ cursor: 'grab', touchAction: 'none' }}>
+      <div className="vista-popup__titlebar" onPointerDown={onPointerDown} style={{ cursor: 'grab' }}>
         <span className="vista-popup__title">{title}</span>
         <div className="vista-popup__controls" onPointerDown={(e) => e.stopPropagation()}>
-          <span className="vista-popup__ctrl" onClick={handleMinimize} onTouchEnd={handleMinimize} style={{ cursor: 'pointer' }}>—</span>
-          <span className="vista-popup__ctrl vista-popup__ctrl--close" onClick={handleClose} onTouchEnd={handleClose} style={{ cursor: 'pointer' }}>✕</span>
+          <span className="vista-popup__ctrl" onClick={handleMinimize} style={{ cursor: 'pointer' }}>—</span>
+          <span className="vista-popup__ctrl vista-popup__ctrl--close" onClick={handleClose} style={{ cursor: 'pointer' }}>✕</span>
         </div>
       </div>
       {!minimized && (
