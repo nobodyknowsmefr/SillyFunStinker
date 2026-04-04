@@ -1,0 +1,652 @@
+/* ========================================
+   SHAPE FORTUNE — 1970s Primary Geometric
+   Bauhaus-inspired minimalistic design
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --red: #D63230;
+  --blue: #1B4DE4;
+  --green: #2D936C;
+  --yellow: #F5B700;
+
+  --cream: #FAF8F5;
+  --cream-t60: rgba(250, 248, 245, 0.6);
+  --cream-t92: rgba(250, 248, 245, 0.92);
+  --ink: #1A1918;
+  --ink-70: rgba(26, 25, 24, 0.7);
+  --ink-50: rgba(26, 25, 24, 0.5);
+  --ink-25: rgba(26, 25, 24, 0.25);
+  --ink-12: rgba(26, 25, 24, 0.12);
+  --ink-06: rgba(26, 25, 24, 0.06);
+  --accent: #D63230;
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-display);
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== FULLSCREEN LAYOUT ========== */
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.scene-fullscreen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse at 50% 35%, #FEFCF9 0%, var(--cream) 100%);
+}
+
+.scene-fullscreen canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+
+.scene-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-25);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* ========== FLOATING OVERLAY ========== */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.overlay > * {
+  pointer-events: auto;
+}
+
+/* ========== HEADER LOGO — top center ========== */
+
+.header-logo {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.header-logo__img {
+  height: 175px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ========== CAUSE BADGE — top right ========== */
+
+.cause-badge {
+  position: absolute;
+  top: 34px;
+  right: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid var(--ink-06);
+  border-radius: 4px;
+  padding: 8px 18px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cause-badge:hover {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: var(--ink-12);
+}
+
+.cause-badge__drop {
+  width: 8px;
+  height: 11px;
+  background: var(--blue);
+  border-radius: 0 50% 50% 50%;
+  transform: rotate(45deg);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.cause-badge__label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 400;
+  color: var(--ink-50);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* ========== BACK BUTTON — minimal text ========== */
+
+.back-btn {
+  position: absolute;
+  top: 38px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+}
+
+.back-btn:hover .morph-letter {
+  filter: brightness(1.2) saturate(1.3);
+}
+
+/* ========== CENTER ACTION — geometric reveal ========== */
+
+.center-action {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.reveal-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.2rem;
+  letter-spacing: 5px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 20px 56px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: visible;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.morph-letter {
+  display: inline-block;
+  animation: morphWobble 2.8s ease-in-out infinite;
+  transform-origin: 50% 70%;
+  font-weight: 700;
+  will-change: transform;
+  transition: transform 0.18s ease, filter 0.18s ease;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.morph-letter:hover {
+  transform: scale(1.35) rotate(-4deg) translateY(-3px) !important;
+  filter: brightness(1.1) saturate(1.4);
+  animation-play-state: paused;
+}
+
+.morph-space {
+  display: inline-block;
+  width: 0.35em;
+}
+
+@keyframes morphWobble {
+  0%   { transform: rotate(0deg) scaleX(1) scaleY(1) translateY(0) skewX(0deg); }
+  10%  { transform: rotate(-6deg) scaleX(0.9) scaleY(1.35) translateY(-6px) skewX(3deg); }
+  20%  { transform: rotate(4deg) scaleX(1.1) scaleY(0.85) translateY(5px) skewX(-2deg); }
+  35%  { transform: rotate(-3deg) scaleX(0.88) scaleY(1.28) translateY(-4px) skewX(4deg); }
+  50%  { transform: rotate(7deg) scaleX(1.08) scaleY(0.82) translateY(6px) skewX(-3deg); }
+  65%  { transform: rotate(-5deg) scaleX(0.92) scaleY(1.3) translateY(-5px) skewX(2deg); }
+  80%  { transform: rotate(3deg) scaleX(1.05) scaleY(0.88) translateY(3px) skewX(-4deg); }
+  100% { transform: rotate(0deg) scaleX(1) scaleY(1) translateY(0) skewX(0deg); }
+}
+
+.reveal-btn:hover {
+  background: transparent;
+}
+
+.reveal-btn:active {
+  transform: scale(0.98);
+}
+
+.reveal-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  transform: none !important;
+  background: transparent !important;
+}
+
+.forming-text {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--ink-50);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  animation: pulse-text 2s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+/* ========== RESULTS PANEL — editorial bottom ========== */
+
+.results-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  padding: 0 48px 44px;
+  animation: panel-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes panel-rise {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ========== FORTUNE FLOW — wacky morphing word layout ========== */
+
+.fortune-flow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: none;
+  z-index: 5;
+  padding: 14vh 8vw 0;
+}
+
+.fortune-flow__words {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px 10px;
+  max-width: 720px;
+  line-height: 1.2;
+}
+
+.fortune-word {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 1px;
+  transform:
+    rotate(var(--rot))
+    scaleX(var(--sx))
+    scaleY(var(--sy))
+    skewX(var(--skx))
+    translateY(var(--ty));
+  animation: wordMorph var(--dur) ease-in-out var(--del) infinite,
+             wordEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: 50% 70%;
+  will-change: transform;
+  opacity: 0;
+}
+
+@keyframes wordEnter {
+  from {
+    opacity: 0;
+    transform: rotate(calc(var(--rot) + 12deg)) scaleX(0.3) scaleY(1.8) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform:
+      rotate(var(--rot))
+      scaleX(var(--sx))
+      scaleY(var(--sy))
+      skewX(var(--skx))
+      translateY(var(--ty));
+  }
+}
+
+@keyframes wordMorph {
+  0%   { transform: rotate(var(--rot)) scaleX(var(--sx)) scaleY(var(--sy)) skewX(var(--skx)) translateY(var(--ty)); }
+  15%  { transform: rotate(calc(var(--rot) - 4deg)) scaleX(calc(var(--sx) * 0.88)) scaleY(calc(var(--sy) * 1.18)) skewX(calc(var(--skx) + 3deg)) translateY(calc(var(--ty) - 4px)); }
+  35%  { transform: rotate(calc(var(--rot) + 3deg)) scaleX(calc(var(--sx) * 1.12)) scaleY(calc(var(--sy) * 0.85)) skewX(calc(var(--skx) - 2deg)) translateY(calc(var(--ty) + 3px)); }
+  55%  { transform: rotate(calc(var(--rot) - 2deg)) scaleX(calc(var(--sx) * 0.92)) scaleY(calc(var(--sy) * 1.14)) skewX(calc(var(--skx) + 4deg)) translateY(calc(var(--ty) - 2px)); }
+  75%  { transform: rotate(calc(var(--rot) + 5deg)) scaleX(calc(var(--sx) * 1.08)) scaleY(calc(var(--sy) * 0.9)) skewX(calc(var(--skx) - 3deg)) translateY(calc(var(--ty) + 5px)); }
+  100% { transform: rotate(var(--rot)) scaleX(var(--sx)) scaleY(var(--sy)) skewX(var(--skx)) translateY(var(--ty)); }
+}
+
+.fortune-flow__domain {
+  margin-top: 28px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border: 1.5px solid var(--accent);
+  opacity: 0;
+  animation: wordEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both;
+}
+
+.results-panel__prophecy {
+  max-width: 540px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.results-panel__line {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 0.95rem;
+  line-height: 2;
+  color: var(--ink-50);
+  margin-bottom: 0;
+}
+
+.results-panel__line:first-child {
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.results-panel__domain {
+  display: inline-block;
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border: 1.5px solid var(--accent);
+}
+
+.results-panel__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+/* ========== ACTION BUTTONS — geometric ========== */
+
+.action-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  background: transparent;
+  border: none;
+  padding: 13px 32px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.action-btn:hover .morph-letter {
+  filter: brightness(1.2) saturate(1.3);
+}
+
+.action-btn--outline {
+  background: transparent;
+}
+
+.action-btn--outline:hover .morph-letter {
+  filter: brightness(1.2) saturate(1.3);
+}
+
+.action-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ========== SHAPE GIF — right side dissolve ========== */
+
+.shape-gif {
+  position: absolute;
+  right: -2%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(220px, 28vw, 420px);
+  z-index: 5;
+  filter: blur(0);
+  pointer-events: none;
+}
+
+.shape-gif img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 8%, black 20%);
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 8%, black 20%);
+}
+
+.shape-gif--forming {
+  animation: gif-dissolve-in 2.5s ease-out forwards;
+}
+
+.shape-gif--visible {
+  animation: gif-dissolve-in 1.8s ease-out forwards;
+}
+
+@keyframes gif-dissolve-in {
+  0% {
+    opacity: 0;
+    filter: blur(18px) saturate(0);
+    transform: translateY(-50%) scale(0.88);
+  }
+  30% {
+    opacity: 0.4;
+    filter: blur(10px) saturate(0.4);
+    transform: translateY(-50%) scale(0.94);
+  }
+  60% {
+    opacity: 0.75;
+    filter: blur(4px) saturate(0.8);
+    transform: translateY(-50%) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) saturate(1);
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* ========== EXPORT CARD (hidden, for html2canvas) ========== */
+
+.export-card {
+  width: 560px;
+  background: #FAF8F5;
+  border: 2px solid rgba(26, 25, 24, 0.1);
+  border-radius: 0;
+  padding: 36px;
+  color: #1A1918;
+}
+
+.export-card__header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.export-card__brand {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+}
+
+.export-card__sub {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* -- Necklace arc (2D, matching 3D layout) -- */
+
+.export-necklace {
+  position: relative;
+  width: 480px;
+  height: 130px;
+  margin: 8px auto 16px;
+}
+
+.export-necklace__rope {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.export-necklace__beads {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.export-arc-bead {
+  position: absolute;
+  transform: translate(-50%, -30%);
+}
+
+.export-arc-bead--cube { border-radius: 3px; }
+.export-arc-bead--round { border-radius: 50%; }
+.export-arc-bead--star {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* -- Fortune text (wacky style matching web) -- */
+
+.export-card__fortune {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px 7px;
+  padding: 12px 8px;
+  line-height: 1.3;
+}
+
+.export-fortune-word {
+  display: inline-block;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transform-origin: 50% 70%;
+}
+
+.export-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1.5px solid rgba(26, 25, 24, 0.08);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  color: rgba(26, 25, 24, 0.3);
+}
+
+.export-card__code {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 768px) {
+  .brand-mark { top: 20px; left: 20px; gap: 10px; }
+  .brand-mark__text { font-size: 0.6rem; letter-spacing: 2.5px; }
+  .brand-mark__shapes { width: 32px; height: 24px; }
+  .brand-mark__circle { width: 11px; height: 11px; }
+  .brand-mark__triangle { border-left-width: 6px; border-right-width: 6px; border-bottom-width: 11px; }
+  .brand-mark__square { width: 10px; height: 10px; }
+
+  .cause-badge { top: 18px; right: 20px; padding: 6px 14px; }
+  .cause-badge__label { font-size: 0.52rem; }
+
+  .center-action { bottom: 16%; }
+  .reveal-btn {
+    font-size: 0.75rem;
+    padding: 16px 36px;
+    letter-spacing: 3px;
+  }
+
+  .results-panel { padding: 0 16px 28px; }
+  .results-panel__line { font-size: 0.85rem; }
+  .results-panel__line:first-child { font-size: 1.1rem; }
+  .results-panel__actions { gap: 14px; flex-direction: column; align-items: center; }
+  .action-btn { font-size: 1.15rem; padding: 14px 36px; letter-spacing: 2.5px; }
+
+  /* Fortune flow — lower on mobile, below back button */
+  .fortune-flow { padding: 14vh 4vw 0; }
+  .fortune-flow__words {
+    max-width: 92vw;
+    gap: 4px 6px;
+  }
+  .fortune-word { font-size: 14px !important; }
+
+  /* Hide shape GIF on mobile */
+  .shape-gif { display: none !important; }
+}
