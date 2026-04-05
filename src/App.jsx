@@ -317,7 +317,7 @@ export default function App() {
         {showResults && page === 'fortune' && (
           <div className="obtain-action">
             <button className="obtain-btn" onClick={handleObtain}>
-              <WackyText text="OBTAIN" />
+              <WackyText text="click here to obtain" />
             </button>
           </div>
         )}

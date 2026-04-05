@@ -536,9 +536,9 @@ export default function ShopPage({ onBack, fortuneImage }) {
         <div className="notepad-content">
 {`Please make sure to save the image that holds your fortune as well as the instruction on the exact pattern placement for your shapes that you must follow in order to activate the fortune.
 
-Please allow 2 to 4 weeks for the necklaces to be shipped.
+This is a pre-order so please allow 4-5 weeks for the necklaces to be shipped.
 
-Thank you for supporting YKARE and The Shape Store.`}
+Thank you for supporting ykare and The Shape Store.`}
         </div>
       </VistaPopup>
     </>
